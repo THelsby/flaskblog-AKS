@@ -2,12 +2,13 @@
 {% block content %}
    <h1>This is a Home page</h1>
     {% for post in posts %}
-
-        <div>
-            <h3>{{ post.title }}</h3>
-            <p><b> - First Name:</b>{{ post.first_name }}</p>
-            <p><b> - Last Name:</b>{{ post.last_name }}</p>
-            <p> --{{ post.content }}</p>
-        </div>
+         <a href="{{url_for('viewPost', post_id=post.id)}}">
+            <div>
+                <h3>{{ post.title }}</h3>
+                <p> Published at: {{ post.date_posted }}</p>
+                <p><b> - Author:</b>{{post.author.first_name}} {{post.author.last_name}}</p>
+                <p> -- {{post.content[:10]}} ......</p>
+            </div>
+         </a>
     {% endfor %}
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-   <h1>This is a Log in page</h1>
+   <h1>{{current_user.first_name}} {{current_user.last_name}} Account Page</h1>
     <div class="form">
         <form action="" method="post">
             {{ form.hidden_tag() }}
@@ -19,8 +19,8 @@
                 {% endif %}
             {% endfor %}
         </form>
-        <form action="{{url_for('register')}}">
-            <input type="submit" value="Register" />
+        <form action="{{url_for('logout')}}">
+            <input type="submit" value="Logout" />
         </form>
 
     </div>

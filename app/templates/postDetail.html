@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    {% if editPost %}
+      {% if current_user.id == post.author.id %}
+            <h1>Update post</h1>
+            <div class="form">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {% for field in form %}
+                    <div>{% if (field.name != "submit") and (field.name != "csrf_token") %}
+                            {{ field.label }}
+                        {% endif %}
+                    {{ field }}</div>
+
+                    {% if form.errors[field.name] %}
+                        {% for error in form.errors[field.name] %}
+                         <div class="error">
+                           {{ error }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </form>
+            </div>
+        {% else %}
+            <meta http-equiv="Refresh" content="0; url={{url_for('viewPost', post_id=post.id)}}"/>
+        {% endif %}
+    {% else %}
+       <div>
+            <h3>{{ post.title }}</h3>
+            <p> Published at: {{ post.date_posted }}</p>
+            <p><b> - Author:</b>{{post.author.first_name}} {{post.author.last_name}}</p>
+            <p> -- {{ post.content }}</p>
+        </div>
+        {% if current_user.id == post.author.id %}
+
+        <form action="{{url_for('viewPost', post_id=post.id)}}">
+                <input type="hidden" id="editPost" name="editPost" value="1">
+                <input type="submit" value="Update Post" />
+        </form>
+        {% endif %}
+
+     {% endif %}
+
+
+
+{% endblock %}
