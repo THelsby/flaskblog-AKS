@@ -16,9 +16,22 @@ login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-migrate = Migrate(app, db)
 
 from app import routes, models
+
+tables = db.engine.table_names()
+try:
+    tables.remove('alembic_version')
+except ValueError:
+    pass
+
+if len(tables) == 0:
+    db.create_all()
+    db.session.commit()
+    print("Database tables not initialized")
+
+
+
 
 
 
