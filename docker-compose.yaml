@@ -1,0 +1,30 @@
+version: '3.6'
+services:
+
+  database:
+    image: mysql:5.7
+    container_name: flaskdb
+    ports:
+      - target: 3306
+        published: 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: flaskblogdb
+    healthcheck:
+      test: ["CMD","curl","-f", "http://localhost:3306"]
+      interval: 10s
+      timeout: 2s
+      retries: 10    
+
+  flaskblog:
+    image: flaskblog:latest
+    build: .
+    environment:
+     - DB_CONT_NAME=flaskdb
+    ports:
+      - target: 5000
+        published: 5000
+        protocol: tcp
+    depends_on:
+      - database
+  
