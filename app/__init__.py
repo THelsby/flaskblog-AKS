@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-import os
+import os, time, pymysql
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,7 +23,22 @@ bcrypt = Bcrypt(app)
 
 from app import routes, models
 
-tables = db.engine.table_names()
+
+retries = 128
+
+for x in range(retries):
+    try:
+        tables = db.engine.table_names()
+        break
+    except Exception as exc:
+        print(exc)
+        if x < retries - 1:
+            print("DB connection failed, retrying...")
+            time.sleep(1)
+        else:
+            print("Error connecting to DB after ", retries, " retries")
+            exit()
+
 try:
     tables.remove('alembic_version')
 except ValueError:
