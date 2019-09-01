@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flaskblog
+  labels:
+    app: flaskblog
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: flaskblog
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskblog
+spec:
+  selector:
+    matchLabels:
+      app: flaskblog
+      tier: frontend
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flaskblog
+        tier: frontend
+    spec:
+      containers:
+      - name: flaskblog
+        image: flaskblogacr123.azurecr.io/flaskblog:v1
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_CONT_NAME
+          value: flaskdb
+        - name: MYSQL_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 5000
+          name: flaskblog
+---

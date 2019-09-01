@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flaskdb
+  labels:
+    app: flaskblog
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: flaskblog
+    tier: flaskdb
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flaskdb-pv-claim
+  labels:
+    app: flaskblog
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: default
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: flaskdb
+  labels:
+    app: flaskblog
+spec:
+  selector:
+    matchLabels:
+      app: flaskblog
+      tier: flaskdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flaskblog
+        tier: flaskdb
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: flaskdb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        - name: MYSQL_DATABASE
+          value: flaskblogdb        
+
+        ports:
+        - containerPort: 3306
+          name: flaskdb
+        volumeMounts:
+        - name: flaskdb-persistent-storage
+          mountPath: /var/lib/mysql
+          subPath: mysql
+      volumes:
+      - name: flaskdb-persistent-storage
+        persistentVolumeClaim:
+          claimName: flaskdb-pv-claim
